@@ -1,3 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">YourStory</string>
+    <string name="auth_desc">Selamat datang pilih tombol dibawah ini untuk lanjut</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="login_desc">Masuk dengan akun anda</string>
+    <string name="password">password</string>
+    <string name="Email">Email</string>
+    <string name="login_image">login_image</string>
+    <string name="register_desc">Daftarkan akun anda</string>
 </resources>
