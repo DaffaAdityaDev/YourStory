@@ -3,7 +3,7 @@ package com.example.yourstory.viewmodel.auth.login
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class LoginActivityViewModel : ViewModel() {
+class LoginViewModel : ViewModel() {
     private var _number: MutableLiveData<Int> = MutableLiveData(0)
     val number: MutableLiveData<Int>
         get() = _number

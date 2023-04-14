@@ -3,13 +3,12 @@ package com.example.yourstory.view.auth.login
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import com.example.yourstory.R
 import com.example.yourstory.databinding.AuthLoginActivityBinding
-import com.example.yourstory.viewmodel.auth.login.LoginActivityViewModel
+import com.example.yourstory.viewmodel.auth.login.LoginViewModel
 
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: LoginActivityViewModel
+    private lateinit var viewModel: LoginViewModel
     private lateinit var binding: AuthLoginActivityBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,10 +16,9 @@ class LoginActivity : AppCompatActivity() {
         binding = AuthLoginActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        actionBar?.title = "Login"
-        actionBar?.hide()
+        supportActionBar?.hide()
 
-        viewModel = LoginActivityViewModel()
+        viewModel = LoginViewModel()
 
         binding.btLoginPage.setOnClickListener {
             val email = binding.etEmail.text.toString()
