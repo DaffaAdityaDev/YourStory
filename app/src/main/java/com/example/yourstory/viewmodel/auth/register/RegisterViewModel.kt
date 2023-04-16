@@ -7,38 +7,32 @@ import androidx.lifecycle.viewModelScope
 import com.example.yourstory.model.RegisterResponse
 import com.example.yourstory.model.repository.Repository
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import retrofit2.HttpException
 
 class RegisterViewModel(private val repository: Repository) : ViewModel() {
-    private var _number: MutableLiveData<Int> = MutableLiveData(0)
     var _postResponse: MutableLiveData<RegisterResponse> = MutableLiveData()
 
-    val number: MutableLiveData<Int>
-        get() = _number
-
-    fun increment() {
-        _number.value = _number.value?.plus(1)
-    }
-
-    fun postRegister(name : String, email : String, password : String) {
+    fun postRegister(name: String, email: String, password: String) {
         viewModelScope.launch {
             try {
+                _postResponse.value = RegisterResponse(false, "Loading...")
                 val response = repository.postRegister(name, email, password)
-                _postResponse.value = response
+                if (response.isSuccessful) {
+                    // Handle successful response
+                    _postResponse.value = response.body()
+                    Log.d("RegisterViewModel", "postRegister: ${response.body()}")
+                } else {
+                    // Handle unsuccessful response
+                    val errorBody = response.errorBody()?.string()
+                    val jsonObject = JSONObject(errorBody)
+                    val message = jsonObject.getString("message")
+                    Log.d("RegisterViewModel", "postRegister: Error - $message")
+                    _postResponse.value = RegisterResponse(true, message)
+                }
             } catch (e: HttpException) {
                 // Handle HTTP error here
-                when (e.code()) {
-                    400 -> {
-                        // Handle HTTP 400 error
-                        Log.d("RegisterActivity", "postRegister: ${e.message()}")
-                        _postResponse.value = RegisterResponse(false, e.message())
-
-                    }
-                    // Handle other HTTP errors here
-                    else -> {
-                        // Handle other HTTP errors
-                    }
-                }
+                _postResponse.value = RegisterResponse(true, e.message())
             } catch (e: Exception) {
                 // Handle other exceptions here
             }
