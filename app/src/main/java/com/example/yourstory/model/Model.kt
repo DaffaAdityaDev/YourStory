@@ -16,15 +16,33 @@ data class RegisterResponse(
 )
 
 @Serializable
-data class LoginResponse(
+data class LoginRequest(
     val error: Boolean,
     val message: String,
-    val loginResult: LoginResult
+    val loginResult: LoginResponseData
 )
 
 @Serializable
-data class LoginResult(
+data class LoginResponseData(
     val userId: String,
     val name: String,
     val token: String
 )
+@Serializable
+data class StoryRequest(
+    val error: Boolean,
+    val message: String,
+    val listStory: List<StoryResponseData>
+)
+@Serializable
+data class StoryResponseData(
+    val id: String,
+    val name: String,
+    val description: String,
+    val photoUrl: String,
+    val createdAt: String,
+    val lat: Double,
+    val lon: Double
+)
+
+

@@ -17,7 +17,7 @@ class RegisterViewModel(private val repository: Repository) : ViewModel() {
         viewModelScope.launch {
             try {
                 _postResponse.value = RegisterResponse(false, "Loading...")
-                val response = repository.postRegister(name, email, password)
+                val response = repository.POSTRegister(name, email, password)
                 if (response.isSuccessful) {
                     // Handle successful response
                     _postResponse.value = response.body()
