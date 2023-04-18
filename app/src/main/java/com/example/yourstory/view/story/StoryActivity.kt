@@ -1,25 +1,23 @@
 package com.example.yourstory.view.story
 
 import android.content.Intent
-import android.content.SharedPreferences
-import android.media.session.MediaSession.Token
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import androidx.lifecycle.ViewModel
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.yourstory.R
 import com.example.yourstory.databinding.StoryActivityBinding
+import com.example.yourstory.model.StoryResponseData
 import com.example.yourstory.model.repository.Repository
 import com.example.yourstory.model.utils.SessionManager
 import com.example.yourstory.view.auth.AuthActivity
-import com.example.yourstory.view.auth.login.LoginActivity
-import com.example.yourstory.viewmodel.auth.AuthViewModelFactory
-import com.example.yourstory.viewmodel.auth.story.StoryViewModel
-import com.example.yourstory.viewmodel.auth.story.StoryViewModelFactory
+import com.example.yourstory.view.story.recyclerview.adapter.StoryAdapter
+import com.example.yourstory.viewmodel.story.StoryViewModel
+import com.example.yourstory.viewmodel.story.StoryViewModelFactory
 
 class StoryActivity : AppCompatActivity() {
 
@@ -36,18 +34,35 @@ class StoryActivity : AppCompatActivity() {
         val viewModelFactory = StoryViewModelFactory(repository, sessionManager)
         viewModel = ViewModelProvider(this, viewModelFactory)[StoryViewModel::class.java]
 
+        if (viewModel.checkLoginStatus() == false) {
+            val intent = Intent(this, AuthActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            startActivity(intent)
+        }
+
         val token = viewModel.getToken() ?: ""
         Log.d("StoryActivity", "Token: $token")
         viewModel.GETStoriesList("Bearer " + token)
 
         viewModel._storiesList.observe(this) { stories ->
-            Log.d("StoryActivity", "Stories: $stories + $token")
+            Log.d("StoryActivity", "Stories: ${stories}")
+            if (stories != null) {
+                listStory(stories)
+            }
         }
 
-        if (viewModel.checkLoginStatus() == false) {
-            val intent = Intent(this, AuthActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            startActivity(intent)
+        binding.bottomNavigation.setOnNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.action_upload -> {
+                    Log.d("StoryActivity", "Home")
+                    return@setOnNavigationItemSelectedListener true
+                }
+                R.id.settings -> {
+                    Log.d("StoryActivity", "Profile")
+                    return@setOnNavigationItemSelectedListener true
+                }
+                else -> false
+            }
         }
     }
 
@@ -69,10 +84,19 @@ class StoryActivity : AppCompatActivity() {
                 Log.d("StoryActivity", "Logout")
                 viewModel.clearAuthToken()
                 val intent = Intent(this, AuthActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 startActivity(intent)
                 return true
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    fun listStory(stories: List<StoryResponseData>) {
+        val storyList = stories
+        val recyclerView = binding.storyRecyclerView
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = StoryAdapter(storyList)
+
     }
 }

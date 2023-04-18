@@ -1,6 +1,5 @@
-package com.example.yourstory.viewmodel.auth.story
+package com.example.yourstory.viewmodel.story
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

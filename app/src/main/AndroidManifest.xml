@@ -14,10 +14,14 @@
         android:theme="@style/Theme.YourStory"
         tools:targetApi="31">
         <activity
+            android:name=".view.story.detailstory.DetailStory"
+            android:exported="false" />
+        <activity
+            android:name=".view.story.addstory.AddStoryActivity"
+            android:exported="false" />
+        <activity
             android:name=".view.story.StoryActivity"
-            android:noHistory="true"
             android:exported="true">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,15 +30,14 @@
         </activity>
         <activity
             android:name=".view.auth.login.LoginActivity"
-            android:noHistory="true"
-            android:exported="false" />
+            android:exported="false"
+            android:noHistory="true" />
         <activity
             android:name=".view.auth.register.RegisterActivity"
             android:exported="false" />
         <activity
             android:name=".view.auth.AuthActivity"
             android:exported="true" />
-
     </application>
 
 </manifest>

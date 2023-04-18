@@ -1,5 +1,7 @@
 package com.example.yourstory.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -35,6 +37,7 @@ data class StoryRequest(
     val listStory: List<StoryResponseData>
 )
 @Serializable
+@Parcelize
 data class StoryResponseData(
     val id: String,
     val name: String,
@@ -43,6 +46,6 @@ data class StoryResponseData(
     val createdAt: String,
     val lat: Double,
     val lon: Double
-)
+) : Parcelable
 
 
