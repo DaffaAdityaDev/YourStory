@@ -1,9 +1,8 @@
 package com.example.yourstory.model.api
 
-import com.example.yourstory.model.LoginRequest
-import com.example.yourstory.model.RegisterRequest
-import com.example.yourstory.model.RegisterResponse
-import com.example.yourstory.model.StoryRequest
+import com.example.yourstory.model.*
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -25,5 +24,16 @@ interface DicodingAPI {
         @Query("size") size: Int?,
         @Query("location") location: Int?
     ) : Response<StoryRequest>
+
+    @Multipart
+    @POST("stories")
+    suspend fun POSTStory(
+        @Header("Authorization") token: String,
+        @Part photo: MultipartBody.Part,
+        @Part("description") description: RequestBody,
+        @Part("lat") lat: Float?,
+        @Part("lon") lon: Float?
+    ) : Response<GetStoryResponse>
+
 }
 

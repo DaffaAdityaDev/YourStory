@@ -15,6 +15,7 @@ import com.example.yourstory.model.StoryResponseData
 import com.example.yourstory.model.repository.Repository
 import com.example.yourstory.model.utils.SessionManager
 import com.example.yourstory.view.auth.AuthActivity
+import com.example.yourstory.view.story.addstory.AddStoryActivity
 import com.example.yourstory.view.story.recyclerview.adapter.StoryAdapter
 import com.example.yourstory.viewmodel.story.StoryViewModel
 import com.example.yourstory.viewmodel.story.StoryViewModelFactory
@@ -55,6 +56,8 @@ class StoryActivity : AppCompatActivity() {
             when (it.itemId) {
                 R.id.action_upload -> {
                     Log.d("StoryActivity", "Home")
+                    val intent = Intent(this, AddStoryActivity::class.java)
+                    startActivity(intent)
                     return@setOnNavigationItemSelectedListener true
                 }
                 R.id.settings -> {

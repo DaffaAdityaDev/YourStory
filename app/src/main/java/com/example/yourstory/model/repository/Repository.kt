@@ -1,10 +1,9 @@
 package com.example.yourstory.model.repository
 
-import com.example.yourstory.model.LoginRequest
-import com.example.yourstory.model.RegisterRequest
-import com.example.yourstory.model.RegisterResponse
-import com.example.yourstory.model.StoryRequest
+import com.example.yourstory.model.*
 import com.example.yourstory.model.api.RetrofitInstanceBuilder
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Response
 
 class Repository {
@@ -31,5 +30,15 @@ class Repository {
         location: Int? = null
     ): Response<StoryRequest> {
         return DicodingApi.GETAllStories(token, page, size, location)
+    }
+
+    suspend fun POSTStory(
+        token: String,
+        description: RequestBody,
+        photo: MultipartBody.Part,
+        lat: Float? = null,
+        lon: Float? = null
+    ): Response<GetStoryResponse> {
+        return DicodingApi.POSTStory(token, photo, description, lat, lon)
     }
 }
