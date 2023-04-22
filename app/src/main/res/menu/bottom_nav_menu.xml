@@ -2,10 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/action_upload"
-        android:icon="@drawable/ic_launcher_background"
-        android:title="Search" />
-    <item
-        android:id="@+id/settings"
-        android:icon="@drawable/ic_launcher_background"
-        android:title="Settings" />
+        android:icon="@drawable/camera_alt_24"
+        android:title="Upload Image" />
+
 </menu>

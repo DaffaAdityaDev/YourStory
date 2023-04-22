@@ -2,8 +2,10 @@ package com.example.yourstory.view.story.addstory
 
 import android.Manifest
 import android.content.Intent
+import android.content.Intent.ACTION_GET_CONTENT
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -11,10 +13,10 @@ import android.os.Looper
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.ImageCapture
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import com.example.yourstory.R
 import com.example.yourstory.databinding.StoryAddActivityBinding
 import com.example.yourstory.model.repository.Repository
 import com.example.yourstory.model.utils.SessionManager
@@ -22,6 +24,7 @@ import com.example.yourstory.view.story.StoryActivity
 import com.example.yourstory.view.story.camera.CameraActivity
 import com.example.yourstory.view.story.camera.utils.reduceFileImage
 import com.example.yourstory.view.story.camera.utils.rotateFile
+import com.example.yourstory.view.story.camera.utils.uriToFile
 import com.example.yourstory.viewmodel.story.addstory.AddStoryViewModel
 import com.example.yourstory.viewmodel.story.addstory.AddStoryViewModelFactory
 import okhttp3.MediaType.Companion.toMediaType
@@ -29,14 +32,25 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
-import java.util.concurrent.ExecutorService
 
 class AddStoryActivity : AppCompatActivity() {
 
     private lateinit var binding: StoryAddActivityBinding
-    private lateinit var imageCapture: ImageCapture
-    private lateinit var cameraExecutor: ExecutorService
     private lateinit var ViewModel: AddStoryViewModel
+
+    private val launcherIntentGallery = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val selectedImg = result.data?.data as Uri
+            selectedImg.let { uri ->
+                val myFile = uriToFile(uri, this@AddStoryActivity)
+//                rotateFile(myFile, true)
+                ViewModel.setFileImage(myFile)
+                binding.ivPreview.setImageBitmap(BitmapFactory.decodeFile(ViewModel._fileImage?.path))
+            }
+        }
+    }
 
     companion object {
         const val CAMERA_X_RESULT = 200
@@ -47,6 +61,8 @@ class AddStoryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = StoryAddActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        supportActionBar?.title = "Add Story"
 
         val repository = Repository()
         val sessionManager = SessionManager(this)
@@ -65,12 +81,20 @@ class AddStoryActivity : AppCompatActivity() {
             takePhoto()
         }
 
+        binding.OpenGalleryButton.setOnClickListener {
+            startGallery()
+        }
+
         binding.btUpload.setOnClickListener {
             binding.tvStatus.text = "Uploading..."
             binding.tvStatus.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark))
             binding.tvStatus.visibility = android.view.View.VISIBLE
             uploadImage()
         }
+
+
+
+        binding.ivPreview.setImageResource(R.drawable.border_line_fill)
 
         ViewModel._message.observe(this) {
             if(it.error == false) {
@@ -90,6 +114,14 @@ class AddStoryActivity : AppCompatActivity() {
                 binding.tvStatus.visibility = android.view.View.VISIBLE
             }
         }
+    }
+
+    private fun startGallery() {
+        val intent = Intent()
+        intent.action = ACTION_GET_CONTENT
+        intent.type = "image/*"
+        val chooser = Intent.createChooser(intent, "Choose a Picture")
+        launcherIntentGallery.launch(chooser)
     }
 
     private fun takePhoto() {
@@ -131,7 +163,7 @@ class AddStoryActivity : AppCompatActivity() {
             myFile?.let { file ->
                 rotateFile(file, isBackCamera)
                 ViewModel.setFileImage(file)
-                binding.ivPreview.setImageBitmap(BitmapFactory.decodeFile(file.path))
+                binding.ivPreview.setImageBitmap(BitmapFactory.decodeFile(ViewModel._fileImage?.path))
             }
         }
     }

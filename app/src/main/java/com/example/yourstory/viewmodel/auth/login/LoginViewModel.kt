@@ -22,9 +22,6 @@ class LoginViewModel(
         return sessionManager.isLoggedIn()
     }
 
-    fun clearAuthToken() {
-        sessionManager.clearAuthToken()
-    }
 
     fun login(email: String, password: String) {
         viewModelScope.launch {

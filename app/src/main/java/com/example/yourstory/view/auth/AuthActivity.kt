@@ -1,10 +1,10 @@
 package com.example.yourstory.view.auth
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import androidx.lifecycle.ViewModel
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.yourstory.databinding.AuthActivityBinding
 import com.example.yourstory.model.repository.Repository
@@ -14,7 +14,6 @@ import com.example.yourstory.view.auth.register.RegisterActivity
 import com.example.yourstory.view.story.StoryActivity
 import com.example.yourstory.viewmodel.auth.AuthViewModel
 import com.example.yourstory.viewmodel.auth.AuthViewModelFactory
-import retrofit2.HttpException
 
 class AuthActivity : AppCompatActivity() {
 
@@ -38,19 +37,6 @@ class AuthActivity : AppCompatActivity() {
         }
 
         Log.d("AuthActivity", "onCreate: ${viewModel.checkLoginStatus()}")
-//        viewModel.postRegister("udin", "udin22@gmail.com", "hatihati")
-//        viewModel._postResponse.observe(this) { response ->
-//            binding.tvAuthHello.text = response.message + "fuck you"
-//            Log.d("AuthActivity", "onCreate: ${response.message}")
-//            if (response.error) {
-//                Log.d("AuthActivity", "onCreate: ${response.message}")
-//                binding.tvAuthHello.text = response.message + "fuck you"
-//            } else {
-//                Log.d("AuthActivity", "onCreate: ${response.message}")
-//                binding.tvAuthHello.text = response.message + "fuck me"
-//            }
-//        }
-
 
         binding.btLogin.setOnClickListener {
             val intent = Intent(this, LoginActivity::class.java)
@@ -62,5 +48,23 @@ class AuthActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        animateLogo()
+    }
+
+    private fun animateLogo() {
+        binding.ivAuth.apply {
+            ViewCompat.setTranslationX(this, -100f)
+            ViewCompat.setAlpha(this, 0f)
+            ViewCompat.animate(this)
+                .translationX(0f)
+                .alpha(1f)
+                .setDuration(500)
+                .setStartDelay((100).toLong())
+                .start()
+        }
     }
 }

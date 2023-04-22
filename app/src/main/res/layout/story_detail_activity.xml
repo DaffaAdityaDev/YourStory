@@ -24,6 +24,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="nama"
+        android:textColor="#000000"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/iv_user_data" />
 
@@ -43,6 +46,9 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="32dp"
         android:text="Deskripsi"
+        android:textColor="#000000"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_date_data" />
 

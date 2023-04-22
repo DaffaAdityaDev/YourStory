@@ -3,7 +3,6 @@ package com.example.yourstory.model
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
-import java.io.File
 
 @Serializable
 data class RegisterRequest(
@@ -48,13 +47,6 @@ data class StoryResponseData(
     val lat: Double,
     val lon: Double
 ) : Parcelable
-
-data class GetStoryRequest(
-    val description: String,
-    val photo: File,
-    val lat: Float? = null,
-    val lon: Float? = null
-)
 
 data class GetStoryResponse(
     val error: Boolean,

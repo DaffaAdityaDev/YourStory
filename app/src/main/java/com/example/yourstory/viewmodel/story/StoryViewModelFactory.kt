@@ -15,7 +15,5 @@ class StoryViewModelFactory(
             return StoryViewModel(repository, sessionManager) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class StoryViewModelFactory")
-
-//        return AuthViewModel(repository) as T
     }
 }

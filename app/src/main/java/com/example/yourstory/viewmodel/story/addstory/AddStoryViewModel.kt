@@ -17,7 +17,6 @@ public class AddStoryViewModel(
         val repository:Repository,
         val sessionManager:SessionManager
 ) : ViewModel() {
-//        val _storiesList = MutableLiveData<List<StoryResponseData>>()
         var _fileImage: File? = null
         var _token = ""
         var _message = MutableLiveData<GetStoryResponse>()
@@ -65,26 +64,4 @@ public class AddStoryViewModel(
                         }
                 }
         }
-
-
-
-//
-//        fun checkLoginStatus(): Boolean {
-//                return sessionManager.isLoggedIn()
-//        }
-//
-//        fun clearAuthToken() {
-//                sessionManager.clearAuthToken()
-//        }
-//
-//        fun getToken() : String? {
-//                return sessionManager.fetchAuthToken()
-//        }
-//
-//        fun GETStoriesList(token: String, page: Int? = null, size: Int? = null, location: Int? = null) {
-//                viewModelScope.launch {
-//                        val response = repository.getAllStories(token, page, size, location)
-//                        _storiesList.value = response.body()?.listStory
-//                }
-//        }
 }

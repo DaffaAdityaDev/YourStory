@@ -1,13 +1,13 @@
 package com.example.yourstory.view.auth.login
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModel
+import androidx.core.view.ViewCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.yourstory.databinding.AuthLoginActivityBinding
 import com.example.yourstory.model.repository.Repository
@@ -28,9 +28,6 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         supportActionBar?.hide()
-
-        binding.etEmail.setText("udin22@gmail.com")
-        binding.etPassword.setText("hatihati")
 
         val repository = Repository()
         val sessionManager = SessionManager(this)
@@ -64,10 +61,6 @@ class LoginActivity : AppCompatActivity() {
         }
 
         Log.d("LoginActivity", "Login Status: ${viewModel.checkLoginStatus().toString()}")
-//        if (viewModel.checkLoginStatus() == true) {
-//            viewModel.clearAuthToken()
-//        }
-//        Log.d("LoginActivity", "Login Status: ${viewModel.checkLoginStatus().toString()}")
 
         binding.btLoginPage.setOnClickListener {
             val email = binding.etEmail.text.toString()
@@ -80,8 +73,23 @@ class LoginActivity : AppCompatActivity() {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
         }
+    }
 
-//        binding.imageView.setImageResource(R.drawable.ic_launcher_background)
+    override fun onResume() {
+        super.onResume()
+        animateLogo()
+    }
 
+    private fun animateLogo() {
+        binding.ivLogin.apply {
+            ViewCompat.setTranslationX(this, -100f)
+            ViewCompat.setAlpha(this, 0f)
+            ViewCompat.animate(this)
+                .translationX(0f)
+                .alpha(1f)
+                .setDuration(500)
+                .setStartDelay((100).toLong())
+                .start()
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.yourstory.view.story
 
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -25,10 +26,13 @@ class StoryActivity : AppCompatActivity() {
     private lateinit var binding: StoryActivityBinding
     private lateinit var viewModel: StoryViewModel
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = StoryActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        supportActionBar?.title = "Story"
 
         val repository = Repository()
         val sessionManager = SessionManager(this)
@@ -60,14 +64,12 @@ class StoryActivity : AppCompatActivity() {
                     startActivity(intent)
                     return@setOnNavigationItemSelectedListener true
                 }
-                R.id.settings -> {
-                    Log.d("StoryActivity", "Profile")
-                    return@setOnNavigationItemSelectedListener true
-                }
                 else -> false
             }
         }
+
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater: MenuInflater = menuInflater
@@ -98,8 +100,12 @@ class StoryActivity : AppCompatActivity() {
     fun listStory(stories: List<StoryResponseData>) {
         val storyList = stories
         val recyclerView = binding.storyRecyclerView
+        val animator  = ObjectAnimator.ofFloat(recyclerView, "translationX", 1000f, 0f)
+        animator .duration = 1000
+        animator .start()
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = StoryAdapter(storyList)
-
     }
+
+
 }

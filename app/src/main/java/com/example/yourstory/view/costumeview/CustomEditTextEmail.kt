@@ -4,7 +4,6 @@ import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
-import androidx.appcompat.widget.WithHint
 
 class CustomEditTextEmail : androidx.appcompat.widget.AppCompatEditText {
 

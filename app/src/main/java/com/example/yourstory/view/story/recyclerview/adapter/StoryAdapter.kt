@@ -6,13 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.yourstory.R
 import com.example.yourstory.model.StoryResponseData
 import com.example.yourstory.view.story.detailstory.DetailStory
 
-class StoryAdapter(private val storyList: List<StoryResponseData>) : RecyclerView.Adapter<StoryAdapter.StoryViewHolder>() {
+class StoryAdapter(
+    private val storyList: List<StoryResponseData>,
+) : RecyclerView.Adapter<StoryAdapter.StoryViewHolder>() {
 
     class StoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val name: TextView = itemView.findViewById(R.id.story_name)
@@ -49,8 +52,19 @@ class StoryAdapter(private val storyList: List<StoryResponseData>) : RecyclerVie
             intent.putExtra("storyDetail", user)
             holder.itemView.context.startActivity(intent)
         }
-        // You can use an image loading library like Glide or Picasso to load the image from the URL
-        // Glide.with(holder.photo.context).load(currentItem.photoUrl).into(holder.photo)
+
+        // Apply the animation
+        holder.itemView.apply {
+            ViewCompat.setTranslationX(this, -100f)
+            ViewCompat.setAlpha(this, 0f)
+            ViewCompat.animate(this)
+                .translationX(0f)
+                .alpha(1f)
+                .setDuration(500)
+                .setStartDelay((position * 100).toLong())
+                .start()
+        }
+
     }
 
     override fun getItemCount(): Int {

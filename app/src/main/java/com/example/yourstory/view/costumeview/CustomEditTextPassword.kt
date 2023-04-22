@@ -4,7 +4,6 @@ import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
-import android.widget.EditText
 
 class CustomEditTextPassword : androidx.appcompat.widget.AppCompatEditText {
 

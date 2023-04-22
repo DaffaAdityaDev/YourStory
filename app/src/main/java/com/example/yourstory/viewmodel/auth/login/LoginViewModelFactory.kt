@@ -16,6 +16,5 @@ class LoginViewModelFactory(
             return LoginViewModel(repository, sessionManager) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
-//        return LoginViewModel(repository) as T
     }
 }

@@ -1,11 +1,12 @@
 package com.example.yourstory.view.auth.register
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.yourstory.databinding.AuthRegisterActivityBinding
 import com.example.yourstory.model.repository.Repository
@@ -57,41 +58,6 @@ class RegisterActivity : AppCompatActivity() {
             onRegisterButtonClick(name, email, password)
         }
 
-//        binding.btRegisterPage.setOnClickListener {
-//            val name = binding.edNameInput.text.toString()
-//            val email = binding.edEmailInput.text.toString()
-//            val password = binding.edPasswordInput.text.toString()
-//
-//            if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
-//                Toast.makeText(applicationContext, "Please fill in all fields", Toast.LENGTH_SHORT).show()
-//            } else {
-//                viewModel.postRegister(name, email, password)
-//
-//                // Observe the API response and update the UI accordingly
-//                viewModel._postResponse.observe(this) { response ->
-//                    Log.d(TAG, response.message)
-//                    Toast.makeText(applicationContext, response.message + " - main", Toast.LENGTH_SHORT).show()
-//
-//                    if (response.message == "Bad Request") {
-//                        binding.tvStatus.visibility = android.view.View.VISIBLE
-//                        binding.tvStatus.text = response.message
-//                        binding.tvStatus.setTextColor(resources.getColor(android.R.color.holo_red_dark))
-//
-//                        Log.d(TAG, response.message)
-//                        Toast.makeText(applicationContext, response.message + " - error", Toast.LENGTH_SHORT).show()
-//                    } else {
-//                        binding.tvStatus.visibility = android.view.View.VISIBLE
-//                        binding.tvStatus.text = response.message
-//                        binding.tvStatus.setTextColor(resources.getColor(android.R.color.holo_green_dark))
-//
-//                        Log.d(TAG, response.message)
-//                        Toast.makeText(applicationContext, response.message + " - success", Toast.LENGTH_SHORT).show()
-//                    }
-//                }
-//            }
-//        }
-
-
         binding.tvRegister.setOnClickListener{
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
@@ -121,5 +87,23 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun checkEmailAndPasswordIsValid(email: String, password: String): Boolean {
         return email.matches(VALIDEMAIL.toRegex()) && password.length >= 8
+    }
+
+    override fun onResume() {
+        super.onResume()
+        animateLogo()
+    }
+
+    private fun animateLogo() {
+        binding.imRegister.apply {
+            ViewCompat.setTranslationX(this, -100f)
+            ViewCompat.setAlpha(this, 0f)
+            ViewCompat.animate(this)
+                .translationX(0f)
+                .alpha(1f)
+                .setDuration(500)
+                .setStartDelay((100).toLong())
+                .start()
+        }
     }
 }
