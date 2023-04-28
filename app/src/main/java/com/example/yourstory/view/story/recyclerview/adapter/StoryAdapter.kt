@@ -64,7 +64,6 @@ class StoryAdapter(
                 .setStartDelay((position * 100).toLong())
                 .start()
         }
-
     }
 
     override fun getItemCount(): Int {
