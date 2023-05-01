@@ -2,6 +2,7 @@ package com.example.yourstory.view.story.detailstory
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.yourstory.R
@@ -32,5 +33,7 @@ class DetailStory : AppCompatActivity() {
         binding.tvNameData.text = storyDetail?.name
         binding.tvDateData.text = storyDetail?.createdAt
         binding.tvDescData.text = storyDetail?.description
+
+        Log.d("DetailStory", "onCreate: $storyDetail")
     }
 }
