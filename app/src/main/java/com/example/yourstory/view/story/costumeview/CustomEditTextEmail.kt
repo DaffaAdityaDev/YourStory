@@ -1,4 +1,4 @@
-package com.example.yourstory.view.costumeview
+package com.example.yourstory.view.story.costumeview
 
 import android.content.Context
 import android.text.Editable

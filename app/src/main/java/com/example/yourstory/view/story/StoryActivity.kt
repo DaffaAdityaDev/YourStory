@@ -16,6 +16,7 @@ import com.example.yourstory.model.StoryResponseData
 import com.example.yourstory.model.repository.Repository
 import com.example.yourstory.model.utils.SessionManager
 import com.example.yourstory.view.auth.AuthActivity
+import com.example.yourstory.view.map.MapsActivity
 import com.example.yourstory.view.story.addstory.AddStoryActivity
 import com.example.yourstory.view.story.recyclerview.adapter.StoryAdapter
 import com.example.yourstory.viewmodel.story.StoryViewModel
@@ -46,7 +47,6 @@ class StoryActivity : AppCompatActivity() {
         }
 
         val token = viewModel.getToken() ?: ""
-        Log.d("StoryActivity", "Token: $token")
         viewModel.GETStoriesList("Bearer " + token)
 
         viewModel._storiesList.observe(this) { stories ->
@@ -64,8 +64,17 @@ class StoryActivity : AppCompatActivity() {
                     startActivity(intent)
                     return@setOnNavigationItemSelectedListener true
                 }
+
+                R.id.action_map -> {
+                    Log.d("StoryActivity", "Map")
+                    val intent = Intent(this, MapsActivity::class.java)
+                    startActivity(intent)
+                    return@setOnNavigationItemSelectedListener true
+                }
+
                 else -> false
             }
+
         }
 
     }
@@ -93,6 +102,7 @@ class StoryActivity : AppCompatActivity() {
                 startActivity(intent)
                 return true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }

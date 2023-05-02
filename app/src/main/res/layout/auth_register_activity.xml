@@ -52,7 +52,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
-    <com.example.yourstory.view.costumeview.CustomEditTextEmail
+    <com.example.yourstory.view.story.costumeview.CustomEditTextEmail
         android:id="@+id/edEmailInput"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
@@ -65,7 +65,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edNameInput" />
 
-    <com.example.yourstory.view.costumeview.CustomEditTextPassword
+    <com.example.yourstory.view.story.costumeview.CustomEditTextPassword
         android:id="@+id/edPasswordInput"
         android:layout_width="300dp"
         android:layout_height="wrap_content"

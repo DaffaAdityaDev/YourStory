@@ -5,4 +5,10 @@
         android:icon="@drawable/camera_alt_24"
         android:title="Upload Image" />
 
+    <item
+        android:id="@+id/action_map"
+        android:icon="@drawable/map_24"
+        android:title="Map" />
+
+
 </menu>
