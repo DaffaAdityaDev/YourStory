@@ -3,9 +3,15 @@ package com.example.yourstory.viewmodel.story
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.yourstory.model.StoryResponseData
 import com.example.yourstory.model.repository.Repository
 import com.example.yourstory.model.utils.SessionManager
+import com.example.yourstory.view.story.paging.StoryPagingSource
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class StoryViewModel(
@@ -13,6 +19,13 @@ class StoryViewModel(
     val sessionManager: SessionManager
 ) : ViewModel() {
     val _storiesList = MutableLiveData<List<StoryResponseData>>()
+
+    val storyPagingFlow: Flow<PagingData<StoryResponseData>> = Pager(
+        config = PagingConfig(
+            pageSize = 15
+        ),
+        pagingSourceFactory = { StoryPagingSource(repository.getDicodingAPI(), sessionManager.fetchAuthToken() as String) }
+    ).flow.cachedIn(viewModelScope)
 
     fun checkLoginStatus(): Boolean {
         return sessionManager.isLoggedIn()

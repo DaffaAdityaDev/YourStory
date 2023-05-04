@@ -1,6 +1,5 @@
 package com.example.yourstory.view.story
 
-import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -9,10 +8,10 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.yourstory.R
 import com.example.yourstory.databinding.StoryActivityBinding
-import com.example.yourstory.model.StoryResponseData
 import com.example.yourstory.model.repository.Repository
 import com.example.yourstory.model.utils.SessionManager
 import com.example.yourstory.view.auth.AuthActivity
@@ -21,12 +20,13 @@ import com.example.yourstory.view.story.addstory.AddStoryActivity
 import com.example.yourstory.view.story.recyclerview.adapter.StoryAdapter
 import com.example.yourstory.viewmodel.story.StoryViewModel
 import com.example.yourstory.viewmodel.story.StoryViewModelFactory
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class StoryActivity : AppCompatActivity() {
 
     private lateinit var binding: StoryActivityBinding
     private lateinit var viewModel: StoryViewModel
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,12 +49,14 @@ class StoryActivity : AppCompatActivity() {
         val token = viewModel.getToken() ?: ""
         viewModel.GETStoriesList("Bearer " + token)
 
-        viewModel._storiesList.observe(this) { stories ->
-            Log.d("StoryActivity", "Stories: ${stories}")
-            if (stories != null) {
-                listStory(stories)
-            }
-        }
+//        viewModel._storiesList.observe(this) { stories ->
+//            Log.d("StoryActivity", "Stories: ${stories}")
+//            if (stories != null) {
+//                listStory(stories)
+//            }
+//        }
+
+        setupStoryList()
 
         binding.bottomNavigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
@@ -107,15 +109,25 @@ class StoryActivity : AppCompatActivity() {
         }
     }
 
-    fun listStory(stories: List<StoryResponseData>) {
-        val storyList = stories
-        val recyclerView = binding.storyRecyclerView
-        val animator  = ObjectAnimator.ofFloat(recyclerView, "translationX", 1000f, 0f)
-        animator .duration = 1000
-        animator .start()
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = StoryAdapter(storyList)
+//    fun listStory() {
+//        val recyclerView = binding.storyRecyclerView
+//        val animator  = ObjectAnimator.ofFloat(recyclerView, "translationX", 1000f, 0f)
+//        animator.duration = 1000
+//        animator.start()
+//        recyclerView.layoutManager = LinearLayoutManager(this)
+//        recyclerView.adapter = StoryAdapter()
+//
+//    }
+
+    private fun setupStoryList() {
+        val adapter = StoryAdapter()
+        binding.storyRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.storyRecyclerView.adapter = adapter
+
+        lifecycleScope.launch {
+            viewModel.storyPagingFlow.collectLatest { pagingData ->
+                adapter.submitData(pagingData)
+            }
+        }
     }
-
-
 }

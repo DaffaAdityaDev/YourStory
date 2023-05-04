@@ -1,4 +1,4 @@
-package com.example.yourstory.viewmodel.story.addstory;
+package com.example.yourstory.viewmodel.story.addstory
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
@@ -13,7 +13,7 @@ import okhttp3.RequestBody
 import org.json.JSONObject
 import java.io.File
 
-public class AddStoryViewModel(
+class AddStoryViewModel(
         val repository:Repository,
         val sessionManager:SessionManager
 ) : ViewModel() {
@@ -33,7 +33,11 @@ public class AddStoryViewModel(
                 _token = "Bearer " + sessionManager.fetchAuthToken() as String
         }
 
-        fun uploadImagePost(imageMultipart : MultipartBody.Part, description: RequestBody) {
+        fun uploadImagePost(
+                imageMultipart : MultipartBody.Part,
+                description: RequestBody,
+                lat: Float? = null,
+                lon: Float? = null) {
                 viewModelScope.launch {
                         try {
                                 getSessionToken()
@@ -41,7 +45,9 @@ public class AddStoryViewModel(
                                 val response = repository.POSTStory(
                                         _token,
                                         description,
-                                        imageMultipart
+                                        imageMultipart,
+                                        lat,
+                                        lon
                                 )
                                 if (response.isSuccessful) {
                                         val responseBody = response.body()

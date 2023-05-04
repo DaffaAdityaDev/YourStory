@@ -1,6 +1,7 @@
 package com.example.yourstory.model.repository
 
 import com.example.yourstory.model.*
+import com.example.yourstory.model.api.DicodingAPI
 import com.example.yourstory.model.api.RetrofitInstanceBuilder
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -41,4 +42,12 @@ class Repository {
     ): Response<GetStoryResponse> {
         return DicodingApi.POSTStory(token, photo, description, lat, lon)
     }
+
+    fun getDicodingAPI(): DicodingAPI {
+        return DicodingApi
+    }
+
+
 }
+
+

@@ -60,7 +60,7 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        Log.d("LoginActivity", "Login Status: ${viewModel.checkLoginStatus().toString()}")
+        Log.d("LoginActivity", "Login Status: ${viewModel.checkLoginStatus()}")
 
         binding.btLoginPage.setOnClickListener {
             val email = binding.etEmail.text.toString()

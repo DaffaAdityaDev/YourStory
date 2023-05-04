@@ -52,3 +52,5 @@ data class GetStoryResponse(
     val error: Boolean,
     val message: String,
 )
+
+

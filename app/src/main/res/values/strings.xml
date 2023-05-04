@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="auth_desc">Selamat datang pilih tombol dibawah ini untuk lanjut</string>
     <string name="login">Login</string>
     <string name="register">Register</string>
@@ -9,4 +10,9 @@
     <string name="login_image">login_image</string>
     <string name="register_desc">Daftarkan akun anda</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="normal_type">Normal</string>
+    <string name="satellite_type">Satellite</string>
+    <string name="terrain_type">Terrain</string>
+    <string name="hybrid_type">Hybrid</string>
+    <string name="retry">Retry</string>
 </resources>

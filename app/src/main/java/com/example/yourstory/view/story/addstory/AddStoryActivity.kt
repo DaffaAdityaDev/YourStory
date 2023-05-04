@@ -27,6 +27,8 @@ import com.example.yourstory.view.story.camera.utils.rotateFile
 import com.example.yourstory.view.story.camera.utils.uriToFile
 import com.example.yourstory.viewmodel.story.addstory.AddStoryViewModel
 import com.example.yourstory.viewmodel.story.addstory.AddStoryViewModelFactory
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -37,6 +39,11 @@ class AddStoryActivity : AppCompatActivity() {
 
     private lateinit var binding: StoryAddActivityBinding
     private lateinit var ViewModel: AddStoryViewModel
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+    private var latitude: Float? = null
+    private var longitude: Float? = null
+
 
     private val launcherIntentGallery = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -57,12 +64,14 @@ class AddStoryActivity : AppCompatActivity() {
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
         private const val REQUEST_CODE_PERMISSIONS = 10
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = StoryAddActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         supportActionBar?.title = "Add Story"
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         val repository = Repository()
         val sessionManager = SessionManager(this)
@@ -71,9 +80,7 @@ class AddStoryActivity : AppCompatActivity() {
 
         if (!allPermissionsGranted()) {
             ActivityCompat.requestPermissions(
-                this,
-                REQUIRED_PERMISSIONS,
-                REQUEST_CODE_PERMISSIONS
+                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
             )
         }
 
@@ -87,19 +94,42 @@ class AddStoryActivity : AppCompatActivity() {
 
         binding.btUpload.setOnClickListener {
             binding.tvStatus.text = "Uploading..."
-            binding.tvStatus.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark))
+            binding.tvStatus.setTextColor(
+                ContextCompat.getColor(
+                    this, android.R.color.holo_green_dark
+                )
+            )
             binding.tvStatus.visibility = android.view.View.VISIBLE
-            uploadImage()
+            uploadImage(latitude, longitude)
         }
 
-
+        binding.enableLocation.setOnClickListener {
+            if (binding.enableLocation.isChecked) {
+                getCurrentLocation()
+                Toast.makeText(this, "Location enabled", Toast.LENGTH_SHORT).show()
+                Handler(Looper.getMainLooper()).postDelayed({
+                    if (latitude == null || longitude == null) {
+                        Toast.makeText(this, "Location not found", Toast.LENGTH_SHORT).show()
+                        binding.enableLocation.isChecked = false
+                    } else {
+                        Toast.makeText(
+                            this, "Location found: $latitude, $longitude", Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }, 2000)
+            }
+        }
 
         binding.ivPreview.setImageResource(R.drawable.border_line_fill)
 
         ViewModel._message.observe(this) {
-            if(it.error == false) {
+            if (it.error == false) {
                 binding.tvStatus.text = it.message
-                binding.tvStatus.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark))
+                binding.tvStatus.setTextColor(
+                    ContextCompat.getColor(
+                        this, android.R.color.holo_green_dark
+                    )
+                )
                 binding.tvStatus.visibility = android.view.View.VISIBLE
                 Handler(Looper.getMainLooper()).postDelayed({
                     // Restart StoryActivity
@@ -110,11 +140,43 @@ class AddStoryActivity : AppCompatActivity() {
                 }, 2000)
             } else {
                 binding.tvStatus.text = it.message
-                binding.tvStatus.setTextColor(ContextCompat.getColor(this, android.R.color.holo_red_dark))
+                binding.tvStatus.setTextColor(
+                    ContextCompat.getColor(
+                        this, android.R.color.holo_red_dark
+                    )
+                )
                 binding.tvStatus.visibility = android.view.View.VISIBLE
             }
         }
     }
+
+    private fun getCurrentLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+
+            ActivityCompat.requestPermissions(
+                this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1
+            )
+            return
+        }
+
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            if (location != null) {
+                latitude = location.latitude.toFloat()
+                longitude = location.longitude.toFloat()
+
+//                uploadImage(latitudeFloat, longitudeFloat)
+            } else {
+                Toast.makeText(this, "Unable to get current location.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
 
     private fun startGallery() {
         val intent = Intent()
@@ -129,22 +191,34 @@ class AddStoryActivity : AppCompatActivity() {
         launcherIntentCamera.launch(intent)
     }
 
-    private fun uploadImage() {
+    private fun uploadImage(latitude: Float?, longitude: Float?) {
         if (ViewModel.getFileImage() != null) {
-
 
             val file = reduceFileImage(ViewModel.getFileImage() as File)
             val desc = binding.etDescImage.text.toString()
 
+            if (desc.isEmpty()) {
+                Toast.makeText(
+                    this, "Silakan masukkan deskripsi terlebih dahulu.", Toast.LENGTH_SHORT
+                ).show()
+                binding.tvStatus.visibility = android.view.View.INVISIBLE
+                return
+            }
+
             val requestImageFile = file.asRequestBody("image/jpeg".toMediaType())
             val description = desc.toRequestBody("text/plain".toMediaType())
 
-            val imageMultipart: MultipartBody.Part = MultipartBody.Part.createFormData("photo", file.name, requestImageFile)
+            val imageMultipart: MultipartBody.Part =
+                MultipartBody.Part.createFormData("photo", file.name, requestImageFile)
 
-            ViewModel.uploadImagePost(imageMultipart, description)
+
+            ViewModel.uploadImagePost(imageMultipart, description, latitude, longitude)
 
         } else {
-            Toast.makeText(this, "Silakan masukkan berkas gambar terlebih dahulu.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this, "Silakan masukkan berkas gambar terlebih dahulu.", Toast.LENGTH_SHORT
+            ).show()
+            binding.tvStatus.visibility = android.view.View.INVISIBLE
         }
     }
 
@@ -156,8 +230,7 @@ class AddStoryActivity : AppCompatActivity() {
             val myFile = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 it.data?.getSerializableExtra("picture", File::class.java)
             } else {
-                @Suppress("DEPRECATION")
-                it.data?.getSerializableExtra("picture")
+                @Suppress("DEPRECATION") it.data?.getSerializableExtra("picture")
             } as? File
             val isBackCamera = it.data?.getBooleanExtra("isBackCamera", true) as Boolean
             myFile?.let { file ->
@@ -168,18 +241,15 @@ class AddStoryActivity : AppCompatActivity() {
         }
     }
 
+
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
+        requestCode: Int, permissions: Array<String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (!allPermissionsGranted()) {
                 Toast.makeText(
-                    this,
-                    "Tidak mendapatkan permission.",
-                    Toast.LENGTH_SHORT
+                    this, "Tidak mendapatkan permission.", Toast.LENGTH_SHORT
                 ).show()
                 finish()
             }
