@@ -114,7 +114,6 @@ class StoryActivity : AppCompatActivity() {
 //        val animator  = ObjectAnimator.ofFloat(recyclerView, "translationX", 1000f, 0f)
 //        animator.duration = 1000
 //        animator.start()
-//        recyclerView.layoutManager = LinearLayoutManager(this)
 //        recyclerView.adapter = StoryAdapter()
 //
 //    }

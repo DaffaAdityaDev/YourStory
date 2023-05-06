@@ -65,6 +65,23 @@ class LoginActivity : AppCompatActivity() {
         binding.btLoginPage.setOnClickListener {
             val email = binding.etEmail.text.toString()
             val password = binding.etPassword.text.toString()
+
+            //check is valid email and password is more than 8 characters
+
+            val validEmail = email.matches(Regex("[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+"))
+
+            if (email.isEmpty() || !validEmail) {
+                binding.etEmail.error = "Email harus sesuai"
+                binding.etEmail.requestFocus()
+                return@setOnClickListener
+            }
+
+            if (password.isEmpty() || password.length < 8) {
+                binding.etPassword.error = "password harus lebih dari 8 karakter"
+                binding.etPassword.requestFocus()
+                return@setOnClickListener
+            }
+
             Log.d("", "Email: $email")
             viewModel.login(email, password)
         }

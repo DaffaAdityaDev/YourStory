@@ -51,14 +51,18 @@ class LoginViewModel(
                 }
             } catch (e: HttpException) {
                 // Handle HTTP error
-                Log.e("LoginViewModel", "HTTP error: \${e.message}")
+                Log.e("LoginViewModel", "HTTP error: ${e.message}")
                 _postResponse.value = LoginRequest(
                     true,
                     e.message(),
                     LoginResponseData("", "", ""))
             } catch (e: Exception) {
                 // Handle other exceptions
-                Log.e("LoginViewModel", "Exception: \${e.message}")
+                Log.e("LoginViewModel", "Exception: ${e.message}")
+                _postResponse.value = LoginRequest(
+                    true,
+                    e.message as String,
+                    LoginResponseData("", "", ""))
             }
         }
     }
