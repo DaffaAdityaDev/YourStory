@@ -1,5 +1,6 @@
 package com.example.yourstory.viewmodel.story
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,11 +17,16 @@ import kotlinx.coroutines.launch
 
 class StoryViewModel(
     val repository: Repository,
-    val sessionManager: SessionManager
+    val sessionManager: SessionManager,
+
 ) : ViewModel() {
     val _storiesList = MutableLiveData<List<StoryResponseData>>()
 
-    val storyPagingFlow: Flow<PagingData<StoryResponseData>> = Pager(
+    val stories: LiveData<PagingData<StoryResponseData>> = repository.getStories(getToken() ?: "")
+        ?.cachedIn(viewModelScope) ?: MutableLiveData(PagingData.empty())
+
+
+    var storyPagingFlow: Flow<PagingData<StoryResponseData>> = Pager(
         config = PagingConfig(
             pageSize = 15
         ),

@@ -7,10 +7,12 @@ import com.example.yourstory.model.StoryResponseData
 import com.example.yourstory.model.api.DicodingAPI
 
 class StoryPagingSource(private val api: DicodingAPI, private val Token: String) : PagingSource<Int, StoryResponseData>() {
+
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, StoryResponseData> {
         return try {
             val nextPageNumber = params.key ?: 1
             val response = api.GETAllStories("Bearer " + Token, nextPageNumber, params.loadSize, null)
+            println("Bearer " + Token)
             val responseData = mutableListOf<StoryResponseData>()
             val data = response.body()?.listStory ?: emptyList()
             responseData.addAll(data)

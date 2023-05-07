@@ -115,7 +115,6 @@ class StoryActivity : AppCompatActivity() {
 //        animator.duration = 1000
 //        animator.start()
 //        recyclerView.adapter = StoryAdapter()
-//
 //    }
 
     private fun setupStoryList() {
