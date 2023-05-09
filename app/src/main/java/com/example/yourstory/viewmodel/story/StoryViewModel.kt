@@ -27,6 +27,7 @@ class StoryViewModel(
             pageSize = 15
         ),
         pagingSourceFactory = {
+
             StoryPagingSource(
                 repository.getDicodingAPI(),
                 sessionManager.fetchAuthToken() as String ?: ""

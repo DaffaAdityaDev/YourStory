@@ -30,23 +30,23 @@ import java.util.concurrent.TimeoutException
 @RunWith(MockitoJUnitRunner::class)
 class StoryViewModelTest {
 
-    companion object {
-        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<StoryResponseData>() {
-            override fun areItemsTheSame(
-                oldItem: StoryResponseData,
-                newItem: StoryResponseData
-            ): Boolean {
-                TODO("Not yet implemented")
-            }
-
-            override fun areContentsTheSame(
-                oldItem: StoryResponseData,
-                newItem: StoryResponseData
-            ): Boolean {
-                TODO("Not yet implemented")
-            }
-        }
-    }
+//    companion object {
+//        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<StoryResponseData>() {
+//            override fun areItemsTheSame(
+//                oldItem: StoryResponseData,
+//                newItem: StoryResponseData
+//            ): Boolean {
+//                TODO("Not yet implemented")
+//            }
+//
+//            override fun areContentsTheSame(
+//                oldItem: StoryResponseData,
+//                newItem: StoryResponseData
+//            ): Boolean {
+//                TODO("Not yet implemented")
+//            }
+//        }
+//    }
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
