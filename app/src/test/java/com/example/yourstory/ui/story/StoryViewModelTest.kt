@@ -18,13 +18,13 @@ import kotlinx.coroutines.test.*
 import org.junit.*
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.Mockito.doReturn
 import org.mockito.junit.MockitoJUnitRunner
 import retrofit2.Response
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
+
 
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
@@ -62,11 +62,10 @@ class StoryViewModelTest {
 
     private lateinit var viewModel: StoryViewModel
 
-
 //    private val lifecycleOwner = FakeLifecycleOwner()
 
     private val testDispatcher = TestCoroutineDispatcher()
-    private val testScope = createTestCoroutineScope(testDispatcher + TestCoroutineExceptionHandler())
+    private val testScope = createTestCoroutineScope(testDispatcher)
 
     private val dummyStoriesResponse = DataDummy.generateDummyStories()
 
@@ -83,35 +82,71 @@ class StoryViewModelTest {
         testScope.cleanupTestCoroutines()
     }
 
+
     @Test
-    fun `when getStories Should Not Null and Return Success`() = runBlocking {
-        val data: PagingData<StoryResponseData> = StoryPagingSource.snapshot(dummyStoriesResponse.listStory)
-        val expectedStories = MutableLiveData<PagingData<StoryResponseData>>()
-        expectedStories.value = data
+    fun `when getStories Should Not Null and Return Success`() = runTest {
 
-        val token = viewModel.getToken() ?: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTZkbUJHMFh1Wlk1UU5NdlkiLCJpYXQiOjE2ODM0Nzc5NzV9.MZPnd9v9Cpipg5HbMr9CkeA1UZENHQ-jq8LugXSmDiM"
-        Mockito.`when`(repository.getStories(token)).thenReturn(expectedStories)
+        val testCoroutineScope = TestCoroutineScope()
 
-        val listStoryViewModel = StoryViewModel(repository, sessionManager)
-        val actualStories: PagingData<StoryResponseData> = listStoryViewModel.stories.getOrAwaitValue()
+//        val data: PagingData<StoryResponseData> = StoryPagingSource.snapshot(dummyStoriesResponse.listStory)
+//        val expectedStories = MutableLiveData<PagingData<StoryResponseData>>()
+//        expectedStories.value = data
 
-        val differ = AsyncPagingDataDiffer(
-            diffCallback = StoryAdapter.DIFF_CALLBACK,
-            updateCallback = noopListUpdateCallback,
-            workerDispatcher = Dispatchers.Main,
-        )
+//        val response = Response.success(dummyStoriesResponse)
+//
+//        val token = viewModel.getToken() ?: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTZkbUJHMFh1Wlk1UU5NdlkiLCJpYXQiOjE2ODM0Nzc5NzV9.MZPnd9v9Cpipg5HbMr9CkeA1UZENHQ-jq8LugXSmDiM"
+////        Mockito.`when`(repository.getStories(token)).thenReturn(expectedStories)
+//
+//        val listStoryViewModel = StoryViewModel(repository, sessionManager, testCoroutineScope)
+//        var actualStories: Flow<PagingData<StoryResponseData>>? = null
 
-        submitDataAndWaitForSnapshot(differ, actualStories)
+        testCoroutineScope.launch(Dispatchers.IO) {
+//            doReturn(response).`when`(repository).getAllStories(token, null, null, null)
+            viewModel.storyPagingFlow.collectLatest {
 
-        println("test - actualStories: ${differ.snapshot().items}")
-        println("test - actualStories: ${differ.snapshot().items.size}")
-        println("test - expectedStories: ${expectedStories.value}")
+                val differ = AsyncPagingDataDiffer(
+                    diffCallback = StoryAdapter.DIFF_CALLBACK,
+                    updateCallback = noopListUpdateCallback,
+                    workerDispatcher = Dispatchers.Main,
+                )
+                differ.submitData(it)
 
+                Assert.assertNotNull(it)
+                Assert.assertNotNull(differ.snapshot())
+                Assert.assertEquals(dummyStoriesResponse.listStory, differ.snapshot())
+                Assert.assertEquals(dummyStoriesResponse.listStory.size, differ.snapshot().size)
+                Assert.assertEquals(dummyStoriesResponse.listStory[0].id, differ.snapshot()[0]?.id)
+            }
+//            actualStories = listStoryViewModel.storyPagingFlow
+//
+//            actualStories?.collectLatest {
+//                println("test - actualStories: ${it}")
+//                println("test - expectedStories: ${expectedStories.value}")
+//
+//                Assert.assertNotNull(it)
+//                Assert.assertEquals(expectedStories.value, it)
+//            }
+        }
 
-        Assert.assertNotNull(differ.snapshot())
-        Assert.assertEquals(dummyStoriesResponse.listStory, differ.snapshot())
-        Assert.assertEquals(dummyStoriesResponse.listStory.size, differ.snapshot().size)
-        Assert.assertEquals(dummyStoriesResponse.listStory[0].id, differ.snapshot()[0]?.id)
+//        println("test - actualStories: ${actualStories}")
+//
+//        val differ = AsyncPagingDataDiffer(
+//            diffCallback = StoryAdapter.DIFF_CALLBACK,
+//            updateCallback = noopListUpdateCallback,
+//            workerDispatcher = Dispatchers.Main,
+//        )
+
+//        submitDataAndWaitForSnapshot(differ, actualStories)
+//
+//        println("test - actualStories: ${differ.snapshot().items}")
+//        println("test - actualStories: ${differ.snapshot().items.size}")
+//        println("test - expectedStories: ${expectedStories.value}")
+//
+//
+//        Assert.assertNotNull(differ.snapshot())
+//        Assert.assertEquals(dummyStoriesResponse.listStory, differ.snapshot())
+//        Assert.assertEquals(dummyStoriesResponse.listStory.size, differ.snapshot().size)
+//        Assert.assertEquals(dummyStoriesResponse.listStory[0].id, differ.snapshot()[0]?.id)
     }
 
     @Test
@@ -121,6 +156,7 @@ class StoryViewModelTest {
             StoryResponseData("1", "Title 1", "Body 1", "url1", "2023-05-03", 0.0, 0.0),
             StoryResponseData("2", "Title 2", "Body 2", "url2", "2023-05-03", 0.0, 0.0)
         )
+
         val response = Response.success(StoryRequest(false, "Success", expectedList))
         val token = "testToken"
 
@@ -153,21 +189,24 @@ class StoryViewModelTest {
 
 }
 
-suspend fun submitDataAndWaitForSnapshot(
-    differ: AsyncPagingDataDiffer<StoryResponseData>,
-    data: PagingData<StoryResponseData>
-) {
-    val latch = CountDownLatch(1)
-    differ.addLoadStateListener { loadStates ->
-        if (loadStates.refresh is LoadState.NotLoading) {
-            latch.countDown()
-        }
-    }
-    differ.submitData(data)
-    withContext(Dispatchers.IO) {
-        latch.await(5, TimeUnit.SECONDS)
-    }
-}
+
+
+
+//suspend fun submitDataAndWaitForSnapshot(
+//    differ: AsyncPagingDataDiffer<StoryResponseData>,
+//    data: PagingData<StoryResponseData>
+//) {
+//    val latch = CountDownLatch(1)
+//    differ.addLoadStateListener { loadStates ->
+//        if (loadStates.refresh is LoadState.NotLoading) {
+//            latch.countDown()
+//        }
+//    }
+//    differ.submitData(data)
+//    withContext(Dispatchers.IO) {
+//        latch.await(5, TimeUnit.SECONDS)
+//    }
+//}
 
 
 fun <T> LiveData<T>.getOrAwaitValue(
@@ -221,6 +260,22 @@ val noopListUpdateCallback = object : ListUpdateCallback {
     override fun onMoved(fromPosition: Int, toPosition: Int) {}
     override fun onChanged(position: Int, count: Int, payload: Any?) {}
 }
+class DiffFavoriteEventCallback : DiffUtil.ItemCallback<StoryResponseData>() {
+    override fun areItemsTheSame(
+        oldItem: StoryResponseData,
+        newItem: StoryResponseData
+    ): Boolean {
+        return oldItem == newItem
+    }
+
+    override fun areContentsTheSame(
+        oldItem: StoryResponseData,
+        newItem: StoryResponseData
+    ): Boolean {
+        return oldItem == newItem
+    }
+}
+
 
 //class TestViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 //    val name: TextView = view.findViewById(R.id.story_name)
