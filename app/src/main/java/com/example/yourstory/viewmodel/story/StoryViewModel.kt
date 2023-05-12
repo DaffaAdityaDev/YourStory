@@ -1,39 +1,41 @@
 package com.example.yourstory.viewmodel.story
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
+import androidx.paging.*
 import com.example.yourstory.model.StoryResponseData
 import com.example.yourstory.model.repository.Repository
 import com.example.yourstory.model.utils.SessionManager
 import com.example.yourstory.view.story.paging.StoryPagingSource
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class StoryViewModel(
     val repository: Repository,
-    val sessionManager: SessionManager,
-    private val coroutineScope: CoroutineScope? = null
+    var sessionManager: SessionManager,
 ) : ViewModel() {
     val _storiesList = MutableLiveData<List<StoryResponseData>>()
 
-    var storyPagingFlow: Flow<PagingData<StoryResponseData>> = Pager(
-        config = PagingConfig(
-            pageSize = 15
-        ),
-        pagingSourceFactory = {
+    val storiesList: LiveData<PagingData<StoryResponseData>> = getStoryPaging().cachedIn(viewModelScope)
 
-            StoryPagingSource(
-                repository.getDicodingAPI(),
-                sessionManager.fetchAuthToken() as String ?: ""
-            )
-        }
-    ).flow.cachedIn(viewModelScope)
+
+
+    fun getStoryPaging(): LiveData<PagingData<StoryResponseData>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 5
+            ),
+            pagingSourceFactory = {
+
+                StoryPagingSource(
+                    repository.getDicodingAPI(),
+                    sessionManager.fetchAuthToken() as String ?: "",
+                    maxPages = 20
+                )
+            }
+        ).liveData
+    }
 
     fun checkLoginStatus(): Boolean {
         return sessionManager.isLoggedIn()

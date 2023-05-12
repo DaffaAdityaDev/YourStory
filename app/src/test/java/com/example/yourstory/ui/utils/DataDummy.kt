@@ -1,13 +1,11 @@
 package com.example.yourstory.ui.utils
 
-import com.example.yourstory.model.GetStoryResponse
-import com.example.yourstory.model.StoryRequest
 import com.example.yourstory.model.StoryResponseData
 
 object DataDummy {
 
-    fun generateDummyStories(): StoryRequest {
-        val listStory = ArrayList<StoryResponseData>()
+    fun generateDummyStories(): List<StoryResponseData> {
+        val listStory : MutableList<StoryResponseData> = arrayListOf()
         for (i in 1..20) {
             val story = StoryResponseData(
                 createdAt = "2022-02-22T22:22:22Z",
@@ -21,17 +19,6 @@ object DataDummy {
             listStory.add(story)
         }
 
-        return StoryRequest(
-            error = false,
-            message = "Stories fetched successfully",
-            listStory = listStory
-        )
-    }
-
-    fun generateDummyCreateStory(): GetStoryResponse {
-        return GetStoryResponse(
-            error = false,
-            message = "success"
-        )
+        return listStory
     }
 }

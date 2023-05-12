@@ -8,7 +8,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.yourstory.R
 import com.example.yourstory.databinding.StoryActivityBinding
@@ -20,8 +19,6 @@ import com.example.yourstory.view.story.addstory.AddStoryActivity
 import com.example.yourstory.view.story.recyclerview.adapter.StoryAdapter
 import com.example.yourstory.viewmodel.story.StoryViewModel
 import com.example.yourstory.viewmodel.story.StoryViewModelFactory
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 
 class StoryActivity : AppCompatActivity() {
 
@@ -122,10 +119,8 @@ class StoryActivity : AppCompatActivity() {
         binding.storyRecyclerView.layoutManager = LinearLayoutManager(this)
         binding.storyRecyclerView.adapter = adapter
 
-        lifecycleScope.launch {
-            viewModel.storyPagingFlow.collectLatest { pagingData ->
-                adapter.submitData(pagingData)
-            }
+        viewModel.storiesList.observe(this) {
+            adapter.submitData(lifecycle, it)
         }
     }
 }

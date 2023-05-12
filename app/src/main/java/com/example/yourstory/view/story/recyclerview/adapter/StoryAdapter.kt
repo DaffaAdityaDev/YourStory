@@ -15,10 +15,7 @@ import com.example.yourstory.R
 import com.example.yourstory.model.StoryResponseData
 import com.example.yourstory.view.story.detailstory.DetailStory
 
-class StoryAdapter :
-    PagingDataAdapter<StoryResponseData, StoryAdapter.StoryViewHolder>(StoryComparator) {
-
-
+class StoryAdapter : PagingDataAdapter<StoryResponseData, StoryAdapter.StoryViewHolder>(DIFF_CALLBACK) {
     class StoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val name: TextView = itemView.findViewById(R.id.story_name)
         val description: TextView = itemView.findViewById(R.id.story_description)
@@ -33,7 +30,6 @@ class StoryAdapter :
 
 
     override fun onBindViewHolder(holder: StoryViewHolder, position: Int) {
-
         if (holder is StoryViewHolder){
             val currentItem = getItem(position) ?: return
             holder.name.text = currentItem.name
@@ -63,17 +59,6 @@ class StoryAdapter :
             fadeIn.duration = 500
             holder.itemView.startAnimation(fadeIn)
 
-            // Apply the animation
-//        holder.itemView.apply {
-//            ViewCompat.setTranslationX(this, -100f)
-//            ViewCompat.setAlpha(this, 0f)
-//            ViewCompat.animate(this)
-//                .translationX(0f)
-//                .alpha(1f)
-//                .setDuration(500)
-//                .setStartDelay((position * 100).toLong())
-//                .start()
-//        }
         }
 
     }
@@ -88,16 +73,8 @@ class StoryAdapter :
                 return oldItem.id == newItem.id
             }
         }
-
-        private val StoryComparator = object : DiffUtil.ItemCallback<StoryResponseData>() {
-            override fun areItemsTheSame(oldItem: StoryResponseData, newItem: StoryResponseData): Boolean {
-                return oldItem.id == newItem.id
-            }
-
-            override fun areContentsTheSame(oldItem: StoryResponseData, newItem: StoryResponseData): Boolean {
-                return oldItem == newItem
-            }
-        }
     }
+
+
 
 }
