@@ -72,7 +72,6 @@ class StoryViewModelTest {
         Assert.assertEquals(dummyData[0].createdAt, differ.snapshot()[0]?.createdAt)
         Assert.assertEquals(dummyData[0].lat, differ.snapshot()[0]?.lat)
         Assert.assertEquals(dummyData[0].lon, differ.snapshot()[0]?.lon)
-
     }
 
 

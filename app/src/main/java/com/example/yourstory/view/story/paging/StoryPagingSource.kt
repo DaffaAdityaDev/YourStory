@@ -16,15 +16,9 @@ open class StoryPagingSource(
 
         return try {
             val nextPageNumber = params.key ?: 1
-            if (nextPageNumber > maxPages) {
-                return LoadResult.Page(data = emptyList(), prevKey = nextPageNumber - 1, nextKey = null)
-            }
             val response = api.GETAllStories("Bearer " + Token, nextPageNumber, params.loadSize, null)
             println("Bearer " + Token)
-//            val responseData = mutableListOf<StoryResponseData>()
-//            val data = response.body()?.listStory ?: emptyList()
-//            responseData.addAll(data)
-//            println("Data: $data") // Debugging line
+
             Log.d("StoryPagingSource", "load: $response nextPageNumber: $nextPageNumber")
 
             return LoadResult.Page(

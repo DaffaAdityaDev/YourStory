@@ -20,7 +20,6 @@ class StoryViewModel(
     val storiesList: LiveData<PagingData<StoryResponseData>> = getStoryPaging().cachedIn(viewModelScope)
 
 
-
     fun getStoryPaging(): LiveData<PagingData<StoryResponseData>> {
         return Pager(
             config = PagingConfig(
@@ -31,7 +30,6 @@ class StoryViewModel(
                 StoryPagingSource(
                     repository.getDicodingAPI(),
                     sessionManager.fetchAuthToken() as String ?: "",
-                    maxPages = 20
                 )
             }
         ).liveData
