@@ -2,7 +2,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.*
 import androidx.paging.*
 import androidx.recyclerview.widget.ListUpdateCallback
-import com.example.yourstory.model.StoryRequest
 import com.example.yourstory.model.StoryResponseData
 import com.example.yourstory.model.repository.Repository
 import com.example.yourstory.model.utils.SessionManager
@@ -10,8 +9,6 @@ import com.example.yourstory.ui.utils.DataDummy
 import com.example.yourstory.ui.utils.getOrAwaitValue
 import com.example.yourstory.view.story.recyclerview.adapter.StoryAdapter
 import com.example.yourstory.viewmodel.story.StoryViewModel
-import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertNotNull
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.*
@@ -20,10 +17,8 @@ import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito
-import org.mockito.Mockito.doReturn
+import org.mockito.Mockito.`when`
 import org.mockito.junit.MockitoJUnitRunner
-import retrofit2.Response
 
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
@@ -40,17 +35,22 @@ class StoryViewModelTest {
     @Mock
     private lateinit var sessionManager: SessionManager
 
+    private lateinit var viewModel: StoryViewModel
 
+    private val dummyData = DataDummy.generateDummyStories()
+
+    @Before
+    fun setUp() {
+        viewModel = StoryViewModel(repository, sessionManager)
+    }
 
     @Test
     fun `when getStories Should Not Null and Return Success`() = runTest {
-        val viewModel = Mockito.spy(StoryViewModel(repository, sessionManager))
-        val dummyData = DataDummy.generateDummyStories()
+        // Call a method on the viewModel that uses the sessionManager
         val data: PagingData<StoryResponseData> = StoryPagingSource.snapshot(dummyData)
         val expectedStories = MutableLiveData<PagingData<StoryResponseData>>()
         expectedStories.value = data
-
-        Mockito.`when`(viewModel.storiesList).thenReturn(expectedStories)
+        `when`(repository.getStoryPaging(repository, sessionManager)).thenReturn(expectedStories)
 
         val actualStory: PagingData<StoryResponseData> = viewModel.storiesList.getOrAwaitValue()
 
@@ -74,48 +74,28 @@ class StoryViewModelTest {
         Assert.assertEquals(dummyData[0].lon, differ.snapshot()[0]?.lon)
     }
 
-
     @Test
-    fun `test successful data loading`() {
-        var viewModel = StoryViewModel(repository, sessionManager)
+    fun `test no data available`() = runTest {
 
-        val expectedList = listOf(
-            StoryResponseData("1", "Title 1", "Body 1", "url1", "2023-05-03", 0.0, 0.0),
-            StoryResponseData("2", "Title 2", "Body 2", "url2", "2023-05-03", 0.0, 0.0)
+        //Given
+        val data: PagingData<StoryResponseData> = PagingData.empty()
+        val expectedStories = MutableLiveData<PagingData<StoryResponseData>>()
+        val differ = AsyncPagingDataDiffer(
+            diffCallback = StoryAdapter.DIFF_CALLBACK,
+            updateCallback = noopListUpdateCallback,
+            workerDispatcher = Dispatchers.Main,
         )
 
-        val response = Response.success(StoryRequest(false, "Success", expectedList))
-        val token = "testToken"
+        //When
+        expectedStories.value = data
+        `when`(repository.getStoryPaging(repository, sessionManager)).thenReturn(expectedStories)
+        val actualStory: PagingData<StoryResponseData> = viewModel.storiesList.getOrAwaitValue()
+        differ.submitData(actualStory)
 
-        runBlockingTest {
-            doReturn(response).`when`(repository).getAllStories(token, null, null, null)
-            viewModel.GETStoriesList(token)
-            delay(1000) // wait for the data to be loaded
-
-            assertNotNull(viewModel._storiesList.value)
-            assertEquals(expectedList.size, viewModel._storiesList.value?.size)
-            assertEquals(expectedList[0], viewModel._storiesList.value?.get(0))
-            assertEquals(expectedList[1], viewModel._storiesList.value?.get(1))
-        }
+        //Then
+        Assert.assertNotNull(differ.snapshot())
+        Assert.assertEquals(0, differ.snapshot().size)
     }
-
-    @Test
-    fun `test no data available`() {
-        var viewModel = StoryViewModel(repository, sessionManager)
-
-        val response = Response.success(StoryRequest(false, "No data", emptyList()))
-        val token = "testToken"
-
-        runBlockingTest {
-            doReturn(response).`when`(repository).getAllStories(token, null, null, null)
-            viewModel.GETStoriesList(token)
-            delay(1000) // wait for the data to be loaded
-
-            assertNotNull(viewModel._storiesList.value)
-            assertEquals(0, viewModel._storiesList.value?.size)
-        }
-    }
-
 }
 
 val noopListUpdateCallback = object : ListUpdateCallback {
@@ -124,7 +104,6 @@ val noopListUpdateCallback = object : ListUpdateCallback {
     override fun onMoved(fromPosition: Int, toPosition: Int) {}
     override fun onChanged(position: Int, count: Int, payload: Any?) {}
 }
-
 
 class StoryPagingSource : PagingSource<Int, LiveData<List<StoryResponseData>>>() {
     companion object {
@@ -154,3 +133,4 @@ class MainDispatcherRule(
         Dispatchers.resetMain()
     }
 }
+

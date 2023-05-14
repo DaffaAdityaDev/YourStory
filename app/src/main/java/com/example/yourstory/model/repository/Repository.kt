@@ -1,8 +1,14 @@
 package com.example.yourstory.model.repository
 
+import androidx.lifecycle.LiveData
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.liveData
 import com.example.yourstory.model.*
 import com.example.yourstory.model.api.DicodingAPI
 import com.example.yourstory.model.api.RetrofitInstanceBuilder
+import com.example.yourstory.model.utils.SessionManager
 import com.example.yourstory.view.story.paging.StoryPagingSource
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -10,6 +16,24 @@ import retrofit2.Response
 
 class Repository {
     private val DicodingApi = RetrofitInstanceBuilder.api
+
+    fun getStoryPaging(
+        repository: Repository,
+        sessionManager: SessionManager,
+    ): LiveData<PagingData<StoryResponseData>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 5
+            ),
+            pagingSourceFactory = {
+
+                StoryPagingSource(
+                    repository.getDicodingAPI(),
+                    sessionManager.fetchAuthToken() as String ?: "",
+                )
+            }
+        ).liveData
+    }
 
     suspend fun POSTRegister(
         name: String,

@@ -14,7 +14,7 @@ class SessionManager(context: Context) {
     }
 
     fun fetchAuthToken(): String? {
-        return sharedPreferences.getString("auth_token", null)
+        return sharedPreferences.getString("auth_token", "empty")
     }
 
     fun clearAuthToken() {
@@ -22,6 +22,6 @@ class SessionManager(context: Context) {
     }
 
     fun isLoggedIn(): Boolean {
-        return fetchAuthToken() != null
+        return fetchAuthToken() != "empty"
     }
 }

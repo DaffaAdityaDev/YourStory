@@ -43,16 +43,6 @@ class StoryActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        val token = viewModel.getToken() ?: ""
-        viewModel.GETStoriesList("Bearer " + token)
-
-//        viewModel._storiesList.observe(this) { stories ->
-//            Log.d("StoryActivity", "Stories: ${stories}")
-//            if (stories != null) {
-//                listStory(stories)
-//            }
-//        }
-
         setupStoryList()
 
         binding.bottomNavigation.setOnNavigationItemSelectedListener {
@@ -106,13 +96,6 @@ class StoryActivity : AppCompatActivity() {
         }
     }
 
-//    fun listStory() {
-//        val recyclerView = binding.storyRecyclerView
-//        val animator  = ObjectAnimator.ofFloat(recyclerView, "translationX", 1000f, 0f)
-//        animator.duration = 1000
-//        animator.start()
-//        recyclerView.adapter = StoryAdapter()
-//    }
 
     private fun setupStoryList() {
         val adapter = StoryAdapter()
